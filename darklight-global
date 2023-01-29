@@ -1,0 +1,112 @@
+#!/bin/bash
+#
+# switch between the light and  dark themes of spotify, kitty, lvim, vscode by one time
+#
+# system  lookandfeeltool
+# kitty   .c/kitty/kitty.conf
+# lvim    .c/lvim/init.lua
+# vscode  .c/Code/User/settings.json
+# spotify .c/spicetify/Themes/...
+#
+
+LOG_PATH=/tmp/global_theme
+LOG_FILE=/tmp/global_theme/logs.log
+
+# system
+#
+SYSTEM_THEME_LIGHT="org.manjaro.breath-light.desktop"
+SYSTEM_THEME_DARK="org.manjaro.breath-dark.desktop"
+
+# spotify
+SPOTIFY_CONFIG_HOME=~/.config/spicetify
+SPOTIFY_CURRENT_THEME=Dribbblish
+SPOTIFY_THEME_LIGHT="Nord-Light"
+SPOTIFY_THEME_DARK="Nord-Dark"
+
+# kitty
+# include kitty-themes/Tango_Light.conf
+KITTY_THEME_CONF_FILE=~/.config/kitty/theme-specify.conf
+KITTY_THEME_LIGHT="Tango_Light\.conf"
+KITTY_THEME_DARK="Nord_Dark\.conf"
+#
+# lvim
+# lvim.colorscheme = "tokyonight-day"
+LUNARVIM_THEME_CONF_FILE=~/.config/lvim/config.lua
+LUNARVIM_THEME_LIGHT="tokyonight-day"
+LUNARVIM_THEME_DARK="lunar"
+#
+# vscode
+# "workbench.colorTheme": "Nord Light",
+VSCODE_THEME_CONF_FILE=~/.config/Code/User/settings.json
+VSCODE_THEME_LIGHT="Quiet Light"
+VSCODE_THEME_DARK="Nord"
+
+# ---------------------------------------------------------------------------
+#
+if [[ $1 == 'dark' ]]; then
+  
+  SYSTEM_THEME_OPTION=$SYSTEM_THEME_DARK
+  SPOTIFY_THEME_OPTION=$SPOTIFY_THEME_DARK
+  KITTY_THEME_OPTION=$KITTY_THEME_DARK
+  LUNARVIM_THEME_OPTION=$LUNARVIM_THEME_DARK
+  VSCODE_THEME_OPTION=$VSCODE_THEME_DARK
+
+elif [[ $1 == 'light' ]]; then
+  
+  SYSTEM_THEME_OPTION=$SYSTEM_THEME_LIGHT
+  SPOTIFY_THEME_OPTION=$SPOTIFY_THEME_LIGHT
+  KITTY_THEME_OPTION=$KITTY_THEME_LIGHT
+  LUNARVIM_THEME_OPTION=$LUNARVIM_THEME_LIGHT
+  VSCODE_THEME_OPTION=$VSCODE_THEME_LIGHT
+
+else
+
+  echo "please select theme: dark or light"
+  exit 0
+
+fi
+  
+#
+# ---------------------------------------------------------------------------
+
+# prepare for logging
+if [[ ! -e $LOG_FILE ]]; then
+  mkdir -p $LOG_PATH
+  touch $LOG_FILE
+fi
+echo > $LOG_FILE
+
+lookandfeeltool --apply $SYSTEM_THEME_OPTION 1>$LOG_FILE 2>$1
+
+if [[ ! -d $SPOTIFY_CONFIG_HOME/Themes/$SPOTIFY_CURRENT_THEME ]]; then
+  git clone --depth=1 https://github.com/spicetify/spicetify-themes.git
+  cp -r /tmp/spicetify-themes/* $SPOTIFY_CONFIG_HOME/Themes
+  rm -rf /tmp/spicetify-themes
+fi
+spicetify config current_theme $SPOTIFY_CURRENT_THEME 1>$LOG_FILE
+spicetify config color_scheme $SPOTIFY_THEME_OPTION 1>$LOG_FILE
+spicetify apply 1>$LOG_FILE
+
+if [[ -e $KITTY_THEME_CONF_FILE ]]; then
+  sed -i "s/^include kitty-themes\/.*\.conf/include kitty-themes\/$KITTY_THEME_OPTION/" $KITTY_THEME_CONF_FILE
+fi
+
+if [[ -e $LUNARVIM_THEME_CONF_FILE ]]; then
+  sed -i "s/^lvim\.colorscheme = \".*\"$/lvim\.colorscheme = \"$LUNARVIM_THEME_OPTION\"/" $LUNARVIM_THEME_CONF_FILE
+fi
+
+if [[ -e $VSCODE_THEME_CONF_FILE ]]; then
+  # sed -i "s/^\s*.*\"workbench\.colorTheme\"\: \".*\",/    \"workbench\.colorTheme\"\: \"$VSCODE_THEME_CONF\",/" $VSCODE_THEME_CONF_FILE
+  jq "to_entries |
+    map(if .key == \"workbench.colorTheme\"
+    then . + {\"value\" : \"$VSCODE_THEME_OPTION\"}
+    else .
+    end) |
+    from_entries" $VSCODE_THEME_CONF_FILE > $VSCODE_THEME_CONF_FILE.tmp
+
+  if [[ -e $VSCODE_THEME_CONF_FILE.tmp ]]; then
+    mv $VSCODE_THEME_CONF_FILE $VSCODE_THEME_CONF_FILE.bak
+    mv $VSCODE_THEME_CONF_FILE.tmp $VSCODE_THEME_CONF_FILE
+  fi
+fi
+
