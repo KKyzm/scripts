@@ -15,8 +15,8 @@ LOG_FILE=/tmp/global_theme/logs.log
 
 # system
 #
-SYSTEM_THEME_LIGHT="org.manjaro.breath-light.desktop"
-SYSTEM_THEME_DARK="org.manjaro.breath-dark.desktop"
+SYSTEM_THEME_LIGHT="org.kde.breeze.desktop"
+SYSTEM_THEME_DARK="org.kde.breezedark.desktop"
 
 # spotify
 SPOTIFY_CONFIG_HOME=~/.config/spicetify
@@ -34,7 +34,8 @@ KITTY_THEME_DARK="Nord_Dark\.conf"
 # lvim.colorscheme = "tokyonight-day"
 LUNARVIM_THEME_CONF_FILE=~/.config/lvim/config.lua
 LUNARVIM_THEME_LIGHT="tokyonight-day"
-LUNARVIM_THEME_DARK="lunar"
+# LUNARVIM_THEME_DARK="lunar"
+LUNARVIM_THEME_DARK="everforest"
 #
 # vscode
 # "workbench.colorTheme": "Nord Light",
