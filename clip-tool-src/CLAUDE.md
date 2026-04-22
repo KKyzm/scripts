@@ -5,8 +5,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build & Test Commands
 
 ```bash
-# Build clip-tool (creates binary at bin/clip-tool and updates symlink in bin/)
+# Build clip-tool binary only
 ./build.sh
+
+# Build all tools and create symlinks (recommended)
+../build.sh
 
 # Run all tests
 go test ./...

@@ -6,12 +6,13 @@ BIN_DIR="$SCRIPT_DIR/bin"
 
 mkdir -p "$BIN_DIR"
 
-# Build clip-tool (Go)
+# Build clip-tool
 echo "Building clip-tool..."
 "$SCRIPT_DIR/clip-tool-src/build.sh"
 
-# Link remote (shell script, no build needed)
-echo "Linking remote..."
+# Create symlinks for all tools
+echo "Creating symlinks..."
+ln -sf ../clip-tool-src/bin/clip-tool "$BIN_DIR/clip-tool"
 ln -sf ../remote-src/remote "$BIN_DIR/remote"
 
 echo ""
