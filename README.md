@@ -9,26 +9,30 @@ This repository is a small collection of custom command-line tools.
 
 ## Layout
 
-- `remote`: standalone shell script at the repository root.
+- `remote-src/`: source code for `remote`.
 - `clip-tool-src/`: source code for `clip-tool`.
-- `bin/clip-tool`: symlink to the built binary.
+- `bin/`: symlinks to all tool entrypoints.
 
 ## Usage
 
 ```bash
-./remote
+./bin/remote
 ./bin/clip-tool
 ```
 
 ## Build
 
-To rebuild `clip-tool`:
+To build all tools and create symlinks:
 
 ```bash
-./clip-tool-src/build.sh
+./build.sh
 ```
 
-This rebuilds the binary and refreshes the symlink in `bin/`.
+To rebuild a single tool:
+
+```bash
+./clip-tool-src/build.sh  # rebuilds clip-tool only
+```
 
 ## Dependencies
 
